@@ -3,12 +3,12 @@ OCAMLFLAGS=-g -bin-annot
 OCAMLOPT=ocamlopt
 OCAMLDEP=ocamldep
 
-MPIINCDIR=$(shell pkg-config --variable=includedir mpich)
-MPILIBDIR=$(shell pkg-config --variable=libdir mpich)
+MPIINCDIR=$(MPI_PATH)/include
+MPILIBDIR=$(MPI_PATH)/lib
 MPICC=mpicc
 MPIRUN=mpirun
 
-CFLAGS=-I`$(OCAMLC) -where` -I$(MPIINCDIR) -O2 -g -Wall -DCAML_NAME_SPACE
+CFLAGS=-I +unix -I`$(OCAMLC) -where` -I$(MPIINCDIR) -O2 -g -Wall -DCAML_NAME_SPACE 
 
 COBJS=init.o comm.o msgs.o collcomm.o groups.o utils.o
 OBJS=mpi.cmo
@@ -17,7 +17,7 @@ all: libcamlmpi.a byte
 
 install:
 	ocamlfind install mpi META mpi.mli mpi.cmi mpi.cmti \
-	    $(wildcard mpi*.cmx) $(wildcard mpi.cm*a) $(wildcard *mpi.a)
+	    $(wildcard mpi*.cmx) $(wildcard mpi.cm*a) $(wildcard *mpi.a) 
 
 uninstall:
 	ocamlfind remove mpi
@@ -42,7 +42,7 @@ opt: $(OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(OCAMLFLAGS) -c $<
 
 testmpi: test.ml mpi.cma libcamlmpi.a
-	ocamlc -g -o testmpi unix.cma bigarray.cma mpi.cma test.ml -ccopt -L$(MPILIBDIR) -ccopt -L.
+	ocamlc -g -o testmpi unix.cma mpi.cma test.ml -ccopt -L$(MPILIBDIR) -ccopt -L.
 
 testmpinb: testnb.ml mpi.cma libcamlmpi.a
 	ocamlc -cc $(CC) -g -o testmpinb unix.cma bigarray.cma mpi.cma testnb.ml -ccopt -L$(MPILIBDIR) -ccopt -L.
